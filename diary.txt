@@ -7,37 +7,128 @@ var repoName = 'misskeydiary'
 //-----------
 
 var docuName = 'README'
-var category = [main, diary, book, music, video]
+var category = ['main', 'diary', 'book', 'music', 'video']
 var selected = 0
 var light = '🟠'
-if (Mk:url().incl('q=')) {
-    docuName = `docs/{Mk:url().split(`{category[selected]}=`)[1].split('&')[0]}`
-}
-
+var test = ''
 
 @reLoad() {
-    var q = docuName
-    if (Mk:url().incl(`{category[0]}=`)) {
-        q = `README`
-    } else if (Mk:url().incl(`{category[selected]}=`)) {
-        q = `{category[selected]}/{Mk:url().split(`{category[selected]}=`)[1].split('&')[0]}`
-    } else {
-        q = 'README'
+
+    var url = Mk:url()
+
+    if (url.incl(category[0])) {
+        selected = 0
+        docuName = 'README'
+    } else if (url.incl(category[1])) {
+        selected = 1
+        docuName = url.split('=')[1]
+    } else if (url.incl(category[2])) {
+        selected = 2
+        docuName = url.split('=')[1]
+    } else if (url.incl(category[3])) {
+        selected = 3
+        docuName = url.split('=')[1]
+    } else if (url.incl(category[4])) {
+        selected = 4
+        docuName = url.split('=')[1]
     }
+
     if (light == '🟠') {
         light = '⚪️'
     } else if (light == '⚪️') {
         light = '🟠'
     }
-    if (docuName != q) {
-        docuName = q
-        test = Mk:fetchMd(githubId, repoName, 'main', docuName)
+
+    print(selected)
+
+    if (selected == 0) {
+        test = Mk:fetchMd(githubId, repoName, 'main', `README`)
         Ui:get('main').update({
+            className: 'maxHeight-400'
+            padding: 10
+            rounded: true
+            bgColor: 'var(--navBg, #884)'
             children: [
                 Ui:C:mfm({text: parseMd(test)})
             ]
         })
+    } else {
+        test = Mk:fetchMd(githubId, repoName, 'main', `{category[selected]}/{docuName}`)
+        Ui:get('main').update({
+            className: 'maxHeight-400'
+            padding: 10
+            rounded: true
+            bgColor: 'var(--navBg, #884)'
+            children: [
+                Ui:C:textInput({
+                    onInput: @(v) { 
+                        if (v != '') {
+                            docuName = `{v}`
+                        } else {
+                            docuName = 'README'
+                        }
+                    }
+                })
+                Ui:C:container({
+                    padding: 10
+                    rounded: true
+                    bgColor: if selected == 0 'var(--bg, #884)' else 'var(--accentLighten)'
+                    children: [
+                        Ui:C:mfm({text: if selected == 0 `[검색](https://i.peacht.art/play/9i81kfze2l)` else `[검색](https://i.peacht.art/play/9i81kfze2l?{category[selected]}={v})`})
+                    ]
+                })
+                Ui:C:mfm({text: parseMd(test)})
+            ]
+        })
     }
+
+    Ui:get('nav').update({
+        className: 'width-100'
+        padding: 7
+        children: [
+            Ui:C:container({
+                padding: 10
+                rounded: true
+                bgColor: if selected == 0 'var(--bg, #884)' else 'var(--accentLighten)'
+                children: [
+                    Ui:C:mfm({text: `[메인](https://i.peacht.art/play/9i81kfze2l?{category[0]}=README)`})
+                ]
+            })
+            Ui:C:container({
+                padding: 10
+                rounded: true
+                bgColor: if selected == 1 'var(--bg, #884)' else 'var(--accentLighten)'
+                children: [
+                    Ui:C:mfm({text: `[다이어리](https://i.peacht.art/play/9i81kfze2l?{category[1]}=README)`})
+                ]
+            })
+            Ui:C:container({
+                padding: 10
+                rounded: true
+                bgColor: if selected == 2 'var(--bg, #884)' else 'var(--accentLighten)'
+                children: [
+                    Ui:C:mfm({text: `[독서일기](https://i.peacht.art/play/9i81kfze2l?{category[2]}=README)`})
+                ]
+            })
+            Ui:C:container({
+                padding: 10
+                rounded: true
+                bgColor: if selected == 3 'var(--bg, #884)' else 'var(--accentLighten)'
+                children: [
+                    Ui:C:mfm({text: `[음악일기](https://i.peacht.art/play/9i81kfze2l?{category[3]}=README)`})
+                ]
+            })
+            Ui:C:container({
+                padding: 10
+                rounded: true
+                bgColor: if selected == 4 'var(--bg, #884)' else 'var(--accentLighten)'
+                children: [
+                    Ui:C:mfm({text: `[영상일기](https://i.peacht.art/play/9i81kfze2l?{category[4]}=README)`})
+                ]
+            })
+        ]
+    })
+    
     Ui:get('light').update({
         align: 'center'
         borderWidth: 4
@@ -79,7 +170,7 @@ if (Mk:url().incl('q=')) {
 }
 
 
-var test = Mk:fetchMd(githubId, repoName, 'main', docuName)
+test = Mk:fetchMd(githubId, repoName, 'main', docuName)
 
 
 var profile = Ui:C:container({
@@ -93,13 +184,13 @@ var profile = Ui:C:container({
             text: `**{myName}**`
         })
         Ui:C:mfm({
-            text: `$[x4 :peachtart2:]`
+            text: `$[x3 :peachtart2:]`
         })
         Ui:C:mfm({
             text: myIntro
         })
     ]
-    }, 'profile')
+}, 'profile')
 
 var main = Ui:C:container({
     className: 'maxHeight-400'
@@ -109,91 +200,51 @@ var main = Ui:C:container({
     children: [
         Ui:C:mfm({text: parseMd(test)})
     ]
-    }, 'main')
-
-@changeandUpdateButton(i) {
-    selected = i
-    Ui:get('button').update({
-        className: 'width-100'
-        padding: 10
-        children: [
-            Ui:C:button({
-                text: '메인'
-                primary: false
-                onClick = @() {
-                    changeandUpdateButton(0)
-                }
-            })
-            Ui:C:button({
-                text: '다이어리'
-                primary: true
-                onClick = @() {
-                    changeandUpdateButton(1)
-                }
-            })
-            Ui:C:button({
-                text: '독서일기'
-                primary: true
-                onClick = @() {
-                    changeandUpdateButton(2)
-                }
-            })
-            Ui:C:button({
-                text: '음악일기'
-                primary: true
-                onClick = @() {
-                    changeandUpdateButton(3)
-                }
-            })
-            Ui:C:button({
-                text: '영상일기'
-                primary: true
-                onClick = @() {
-                    changeandUpdateButton(4)
-                }
-            })
-        ]
-    })
-}
+}, 'main')
 
 var nav = Ui:C:container({
     className: 'width-100'
-    padding: 10
+    padding: 7
     children: [
-        Ui:C:button({
-            text: '메인'
-            primary: false
-            onClick = @() {
-                changeandUpdateButton(0)
-            }
+        Ui:C:container({
+            padding: 10
+            rounded: true
+            bgColor: if selected == 0 'var(--bg, #884)' else 'var(--accentLighten)'
+            children: [
+                Ui:C:mfm({text: `[메인](https://i.peacht.art/play/9i81kfze2l?{category[0]}=README)`})
+            ]
         })
-        Ui:C:button({
-            text: '다이어리'
-            primary: true
-            onClick = @() {
-                changeandUpdateButton(1)
-            }
+        Ui:C:container({
+            padding: 10
+            rounded: true
+            bgColor: if selected == 1 'var(--bg, #884)' else 'var(--accentLighten)'
+            children: [
+                Ui:C:mfm({text: `[다이어리](https://i.peacht.art/play/9i81kfze2l?{category[1]}=README)`})
+            ]
         })
-        Ui:C:button({
-            text: '독서일기'
-            primary: true
-            onClick = @() {
-                changeandUpdateButton(2)
-            }
+        Ui:C:container({
+            padding: 10
+            rounded: true
+            bgColor: if selected == 2 'var(--bg, #884)' else 'var(--accentLighten)'
+            children: [
+                Ui:C:mfm({text: `[독서일기](https://i.peacht.art/play/9i81kfze2l?{category[2]}=README)`})
+            ]
         })
-        Ui:C:button({
-            text: '음악일기'
-            primary: true
-            onClick = @() {
-                changeandUpdateButton(3)
-            }
+        Ui:C:container({
+            padding: 10
+            rounded: true
+            bgColor: if selected == 3 'var(--bg, #884)' else 'var(--accentLighten)'
+            children: [
+                Ui:C:mfm({text: `[음악일기](https://i.peacht.art/play/9i81kfze2l?{category[3]}=README)`})
+            ]
         })
-        Ui:C:button({
-            text: '영상일기'
-            primary: true
-            onClick = @() {
-                changeandUpdateButton(4)
-            }
+        Ui:C:container({
+            padding: 10
+            rounded: true
+            bgColor: if selected == 4 'var(--bg, #884)' else 'var(--accentLighten)'
+            children: [
+                Ui:C:mfm({text: `[영상일기](https://i.peacht.art/play/9i81kfze2l?{category[4]}=README)`})
+            ]
         })
     ]
 }, 'button')
@@ -226,5 +277,6 @@ Ui:C:container({
 } 'contain')
 ]
 
-
 Ui:render(container)
+
+Async:interval(1000, reLoad, false)
