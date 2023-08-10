@@ -1,0 +1,2 @@
+# misskeydiary
+diary project
