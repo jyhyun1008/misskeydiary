@@ -1,0 +1,230 @@
+
+var myName = '재연'
+var myIntro = '난카 이로이로 하는 사람.'
+var githubId = 'jyhyun1008'
+var repoName = 'misskeydiary'
+
+//-----------
+
+var docuName = 'README'
+var category = [main, diary, book, music, video]
+var selected = 0
+var light = '🟠'
+if (Mk:url().incl('q=')) {
+    docuName = `docs/{Mk:url().split(`{category[selected]}=`)[1].split('&')[0]}`
+}
+
+
+@reLoad() {
+    var q = docuName
+    if (Mk:url().incl(`{category[0]}=`)) {
+        q = `README`
+    } else if (Mk:url().incl(`{category[selected]}=`)) {
+        q = `{category[selected]}/{Mk:url().split(`{category[selected]}=`)[1].split('&')[0]}`
+    } else {
+        q = 'README'
+    }
+    if (light == '🟠') {
+        light = '⚪️'
+    } else if (light == '⚪️') {
+        light = '🟠'
+    }
+    if (docuName != q) {
+        docuName = q
+        test = Mk:fetchMd(githubId, repoName, 'main', docuName)
+        Ui:get('main').update({
+            children: [
+                Ui:C:mfm({text: parseMd(test)})
+            ]
+        })
+    }
+    Ui:get('light').update({
+        align: 'center'
+        borderWidth: 4
+        padding: 8
+        rounded: true
+        bgColor: 'var(--bg, #884)'
+        children: [
+            Ui:C:mfm({ text: `{light} <small>깜빡임이 멈추면 페이지를 새로고침해 주세요</small>`})
+        ]
+    })
+}
+
+@parseMd(md) {
+
+   var result = `[메인으로](https://i.peacht.art/play/9i81kfze2l){Str:lf}{Str:lf}{md}`
+
+   //MacOS 대체 문자 에러 수정
+   result = Str:regExReplace(result, '', '')
+
+   result = Str:regExReplace(result, '\n\#\#\#\#\#\#\s([^\n]+)', `{Str:lf}**$1**`)
+   result = Str:regExReplace(result, '\n\#\#\#\#\#\s([^\n]+)', `{Str:lf}**$1**`)
+   result = Str:regExReplace(result, '\n\#\#\#\#\s([^\n]+)', `{Str:lf}**$1**`)
+   result = Str:regExReplace(result, '\n\#\#\#\s([^\n]+)', `{Str:lf}**$1**`)
+   result = Str:regExReplace(result, '\n\#\#\s([^\n]+)', `{Str:lf}**$1**`)
+   result = Str:regExReplace(result, '\n\#\s([^\n]+)', `{Str:lf}$[x2 **$1**]`)
+
+   result = Str:regExReplace(result, '\*\[([^\]]+)\]\(([^\)\n\s\:]+)\)', `<a href='/play/9i81kfze2l?q=$2' class="_link" rel="nofollow noopener">$1</a>`)
+   result = Str:regExReplace(result, '\]\(([^\)\n\s\:]+)\)', '](https://i.peacht.art/play/9i81kfze2l?q=$1)')
+   result = Str:URIReplace(result)
+
+   result = Str:regExReplace(result, '\n\*\s([^\n]+)', `{Str:lf}:arrow_right_without_bar: $1`)
+   result = Str:regExReplace(result, '\n\-\s([^\n]+)', `{Str:lf}:arrow_right_without_bar: $1`)
+   result = Str:regExReplace(result, '\n\ \ \*\s([^\n]+)', `{Str:lf}:blank::arrow_right_without_bar: $1`)
+   result = Str:regExReplace(result, '\n\ \ \-\s([^\n]+)', `{Str:lf}:blank::arrow_right_without_bar: $1`)
+   result = Str:regExReplace(result, '\n\ \ \ \ \*\s([^\n]+)', `{Str:lf}:blank::blank::arrow_right_without_bar: $1`)
+   result = Str:regExReplace(result, '\n\ \ \ \ \-\s([^\n]+)', `{Str:lf}:blank::blank::arrow_right_without_bar: $1`)
+   
+   result
+}
+
+
+var test = Mk:fetchMd(githubId, repoName, 'main', docuName)
+
+
+var profile = Ui:C:container({
+    className: 'maxHeight-400'
+    padding: 10
+    rounded: true
+    bgColor: 'var(--navBg, #884)'
+    align: 'center'
+    children: [
+        Ui:C:mfm({
+            text: `**{myName}**`
+        })
+        Ui:C:mfm({
+            text: `$[x4 :peachtart2:]`
+        })
+        Ui:C:mfm({
+            text: myIntro
+        })
+    ]
+    }, 'profile')
+
+var main = Ui:C:container({
+    className: 'maxHeight-400'
+    padding: 10
+    rounded: true
+    bgColor: 'var(--navBg, #884)'
+    children: [
+        Ui:C:mfm({text: parseMd(test)})
+    ]
+    }, 'main')
+
+@changeandUpdateButton(i) {
+    selected = i
+    Ui:get('button').update({
+        className: 'width-100'
+        padding: 10
+        children: [
+            Ui:C:button({
+                text: '메인'
+                primary: false
+                onClick = @() {
+                    changeandUpdateButton(0)
+                }
+            })
+            Ui:C:button({
+                text: '다이어리'
+                primary: true
+                onClick = @() {
+                    changeandUpdateButton(1)
+                }
+            })
+            Ui:C:button({
+                text: '독서일기'
+                primary: true
+                onClick = @() {
+                    changeandUpdateButton(2)
+                }
+            })
+            Ui:C:button({
+                text: '음악일기'
+                primary: true
+                onClick = @() {
+                    changeandUpdateButton(3)
+                }
+            })
+            Ui:C:button({
+                text: '영상일기'
+                primary: true
+                onClick = @() {
+                    changeandUpdateButton(4)
+                }
+            })
+        ]
+    })
+}
+
+var nav = Ui:C:container({
+    className: 'width-100'
+    padding: 10
+    children: [
+        Ui:C:button({
+            text: '메인'
+            primary: false
+            onClick = @() {
+                changeandUpdateButton(0)
+            }
+        })
+        Ui:C:button({
+            text: '다이어리'
+            primary: true
+            onClick = @() {
+                changeandUpdateButton(1)
+            }
+        })
+        Ui:C:button({
+            text: '독서일기'
+            primary: true
+            onClick = @() {
+                changeandUpdateButton(2)
+            }
+        })
+        Ui:C:button({
+            text: '음악일기'
+            primary: true
+            onClick = @() {
+                changeandUpdateButton(3)
+            }
+        })
+        Ui:C:button({
+            text: '영상일기'
+            primary: true
+            onClick = @() {
+                changeandUpdateButton(4)
+            }
+        })
+    ]
+}, 'button')
+
+
+var book = 
+Ui:C:container({
+    borderWidth: 4
+    padding: 10
+    rounded: true
+    bgColor: 'var(--bg, #884)'
+    className: 'displayFlexEvenWidth'
+    children: [profile, main]
+} 'book')
+
+var container = [
+Ui:C:container({
+   align: 'center'
+   borderWidth: 4
+   padding: 10
+   rounded: true
+   bgColor: 'var(--bg, #884)'
+   children: [
+      Ui:C:mfm({ text: `{light} <small>깜빡임이 멈추면 페이지를 새로고침해 주세요</small>`})
+   ]
+}, 'light')
+Ui:C:container({
+    className: 'displayFlex'
+    children: [book, nav]
+} 'contain')
+]
+
+
+Ui:render(container)

@@ -1,2 +1,3 @@
 # misskeydiary
+
 diary project
