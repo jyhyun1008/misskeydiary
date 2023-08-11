@@ -1,6 +1,6 @@
 
 var myName = '재연'
-var myIntro = '난카 이로이로 하는 사람.'
+var myIntro = `뭔가 이것저것 하는 사람입니다. 사적인 감상을 기록하기 위해 본 페이지를 개설했습니다.{Str:lf}{Str:lf}:cyworld: :peachtart_banner:{Str:lf}피치타르트의 서버장.`
 var githubId = 'jyhyun1008'
 var repoName = 'misskeydiary'
 
@@ -32,6 +32,9 @@ var test = ''
     } else if (url.incl(category[4])) {
         selected = 4
         docuName = url.split('=')[1]
+    } else {
+        selected = 0
+        docuName = 'README'
     }
 
     if (light == '🟠') {
